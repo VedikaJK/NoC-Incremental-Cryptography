@@ -3,6 +3,7 @@ from PIL import Image
 import numpy as np
 from Crypto.Hash import MD5
 import hashlib 
+import DES
   
 def read_image_convert_to_array(file_name):
     a = skimage.io.imread(fname="pic1.jpg") # read image
@@ -90,12 +91,16 @@ def convert_array_to_image(arr_1D,name_for_image, h,w):
 
 
 def main():
-    file_name =input("Enter Image file name : ")
-    block_size_in_bytes =int(input("Enter block_size in bytes : "))
-    IV =int(input("Enter Initialization Vector IV : "))
-    counter = int(input("Enter counter start value : "))
-    bin_hash, md5_hash = encrypt_image(file_name,block_size_in_bytes,IV,counter)
-    print("Binary value of hash : ",bin_hash,"\n","MD5 hash for the image file : ",md5_hash)
+    #file_name =input("Enter Image file name : ")
+    #block_size_in_bytes =int(input("Enter block_size in bytes : "))
+    #IV =int(input("Enter Initialization Vector IV : "))
+    #counter = int(input("Enter counter start value : "))
+    #bin_hash, md5_hash = encrypt_image(file_name,block_size_in_bytes,IV,counter)
+    #print("Binary value of hash : ",bin_hash,"\n","MD5 hash for the image file : ",md5_hash)
+    key = '0E329232EA6D0D73'
+    pt ='596F7572206C6970'
+    print(DES.encrypt_DES(key,pt))
+    print(DES.decrypt_DES(key,DES.encrypt_DES(key,pt)))
 
 if __name__ == "__main__":
     main()
