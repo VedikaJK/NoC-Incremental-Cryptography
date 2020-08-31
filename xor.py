@@ -1,4 +1,6 @@
 import skimage.io
+from PIL import Image
+import numpy as np
 from Crypto.Hash import MD5
 import hashlib 
   
@@ -20,6 +22,32 @@ def binary_pixels_to_blocks(pixels_bin, block_size_in_bytes):
         temp = pixels_bin[3*i:3*(i+1)]
         B.append(''.join(temp)) 
     return B
+    # 64 BIT BLOCKS
+    #t=''
+    #for i in range(len(b)):
+    #    if(i%8==0):
+    #        t = b[i]
+        
+    #    else:
+    #        t+=b[i]
+    #        if((i+1)%8==0):
+    #            D.append(t)
+    #        elif(i==len(b)-1):
+    #            D.append(t)
+    # if len(D[len(D)-1])<64 then ... padding
+
+def randomize_blocks(D_is_array_64bits_blocks):
+    R=[]
+    for i in D_is_array_64bits_blocks:
+        a = hashlib.md5(i.encode('utf-8'))
+        b = a.hexdigest()
+        as_int = int(b, 16)
+        
+        as_bin = bin(as_int)[2:66]   # taking a 64bit no. to randomize
+        randomizer_number = int(as_bin, 2)
+        print(as_int,as_bin,randomizer_number)
+        R.append(bin(randomizer_number*int(i,2)%9223372036854775808)[2:].zfill(64))   # 2 to the power 63
+    return R
 
 def encrypt_image(file_name, block_size_in_bytes, IV, counter):
     arr = read_image_convert_to_array(file_name)
@@ -46,6 +74,17 @@ def encrypt_image(file_name, block_size_in_bytes, IV, counter):
     final_hash_md5 = hash.hexdigest()
     return final_hash_str, final_hash_md5
 
+def convert_array_to_image(arr_1D,name_for_image, h,w):
+    data = np.zeros((h, w, 3), dtype=np.uint8)
+    #code to conert 1D array to 3d array for image
+    # data[i,j] = [x,y,z]
+    #for i in range(len(B)):
+    #x,y,z = B[i][0:8],B[i][8:16],B[i][16:24]
+    #arr_np[i,]= list([int(x,base=2),int(y,base=2),int(z,base=2)])
+
+    img = Image.fromarray(data, 'RGB')
+    img.save(name_for_image)
+    return img
 
 #def incremental_update_image(hash_bin,hash_md5,index_to_update,new_value):
 
@@ -60,5 +99,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
