@@ -5,7 +5,8 @@ from Crypto.Hash import MD5
 import hashlib 
 import DES
   
-def read_image_convert_to_array(file_name):
+def read_image_convert_to_1D_pixel_array(file_name):
+    ## THIS FUNCTION RETURNS ARRAY OF THE FORM [0 128 128 155 0 128 50 10 120 .. ] I.E. LENGTH = PIXELS * 3
     a = skimage.io.imread(fname="pic1.jpg") # read image
     a=a.flatten(order='C') #flattened pixel array
     return a
@@ -16,26 +17,28 @@ def int_array_to_binary(arr):
         binary_arr.append(bin(int(arr[i]))[2:].zfill(8))
     return binary_arr
 
-def binary_pixels_to_blocks(pixels_bin, block_size_in_bytes):
-    B=[]
-    n = len(pixels_bin)//block_size_in_bytes
-    for i in range(n):
-        temp = pixels_bin[3*i:3*(i+1)]
-        B.append(''.join(temp)) 
-    return B
+def binary_pixels_to_blocks(pixels_bin):
     # 64 BIT BLOCKS
-    #t=''
-    #for i in range(len(b)):
-    #    if(i%8==0):
-    #        t = b[i]
-        
-    #    else:
-    #        t+=b[i]
-    #        if((i+1)%8==0):
-    #            D.append(t)
-    #        elif(i==len(b)-1):
-    #            D.append(t)
-    # if len(D[len(D)-1])<64 then ... padding
+    t=''
+    D=[]
+    for i in range(len(pixels_bin)):
+        if(i%8==0):
+            t = pixels_bin[i]
+        else:
+            t+=pixels_bin[i]
+            if((i+1)%8==0):
+                D.append(t)
+            elif(i==len(pixels_bin)-1):
+                D.append(t)
+    ### if len(D[len(D)-1])<64 then ... padding
+    ### INCOMPLETE
+    return D
+
+def image_to_blocks(file_name):
+    arr1 = read_image_convert_to_1D_pixel_array(file_name)
+    arr2 = int_array_to_binary(arr1)
+    D = binary_pixels_to_blocks(arr2)
+    return D
 
 def randomize_blocks(D_is_array_64bits_blocks):
     R=[]
@@ -50,31 +53,33 @@ def randomize_blocks(D_is_array_64bits_blocks):
         R.append(bin(randomizer_number*int(i,2)%9223372036854775808)[2:].zfill(64))   # 2 to the power 63
     return R
 
-def encrypt_image(file_name, block_size_in_bytes, IV, counter):
-    arr = read_image_convert_to_array(file_name)
-    arr =int_array_to_binary(arr)
-    arr = binary_pixels_to_blocks(arr,block_size_in_bytes)
-    list_blocks_int = []
-    blocks_cipher_list = []
-    for i in range(len(arr)):
-        x= (int(arr[i], base=2))
-        c= x^counter^IV
-        counter+=1
-        #final_hash_int^=c
-        list_blocks_int.append(x)
-        blocks_cipher_list.append(c)
-    #final_hash_int = ''.join(blocks_cipher_list)
-    temp=[]
-    for i in range(len(blocks_cipher_list)):
-        temp.append(bin(int(blocks_cipher_list[i]))[2:].zfill(8))
-    final_hash_str = ''.join(temp)
-    
+def f1(key_in_hex,text_in_bin):
+    key=key_in_hex
     hash = MD5.new()
-    message=str(final_hash_str).encode('utf-8')
+    message=text_in_bin.encode('utf-8')
+    hash.update(message)
+    hash_md5 = hash.hexdigest()
+    ### hash_md5 be like 3c1898a00cc4579728e1268191a64bc6 
+    hash_bin=bin(int(hash_md5,16))[2:].zfill(128)
+    ### hash_bin be like 00111100000110001001100010100000000011001...., type = str
+    first_half = int(hash_bin[:64],2)
+    second_half = int(hash_bin[64:],2)
+
+
+    inner_des = DES.encrypt_DES(key, hex(first_half)[2:])   ### hex value
+    final_input = int(inner_des,16)^second_half    
+    result = DES.encrypt_DES(key,hex(final_input)[2:])
+
+def encrypt_message(D):
+    R = randomize_blocks(D)
+    ### f1 chain and hash
+    
+
+    hash = MD5.new()
+    message='abc'.encode('utf-8')
     hash.update(message)
     final_hash_md5 = hash.hexdigest()
-    return final_hash_str, final_hash_md5
-
+    
 def convert_array_to_image(arr_1D,name_for_image, h,w):
     data = np.zeros((h, w, 3), dtype=np.uint8)
     #code to conert 1D array to 3d array for image
