@@ -65,7 +65,6 @@ def f1(key_in_hex,text_in_bin):
     first_half = int(hash_bin[:64],2)
     second_half = int(hash_bin[64:],2)
 
-
     inner_des = DES.encrypt_DES(key, hex(first_half)[2:])   ### hex value
     final_input = int(inner_des,16)^second_half    
     result = DES.encrypt_DES(key,hex(final_input)[2:])
@@ -104,8 +103,9 @@ def main():
     #print("Binary value of hash : ",bin_hash,"\n","MD5 hash for the image file : ",md5_hash)
     key = '0E329232EA6D0D73'
     pt ='596F7572206C6970'
-    print(DES.encrypt_DES(key,pt))
-    print(DES.decrypt_DES(key,DES.encrypt_DES(key,pt)))
+    f1(key,'1101'*16)
+    #print(DES.encrypt_DES(key,pt))
+    #print(DES.decrypt_DES(key,DES.encrypt_DES(key,pt)))
 
 if __name__ == "__main__":
     main()
