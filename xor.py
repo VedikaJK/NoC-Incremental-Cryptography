@@ -101,7 +101,7 @@ def main():
     #counter = int(input("Enter counter start value : "))
     #bin_hash, md5_hash = encrypt_image(file_name,block_size_in_bytes,IV,counter)
     #print("Binary value of hash : ",bin_hash,"\n","MD5 hash for the image file : ",md5_hash)
-    key = '0E329232EA6D0D73'
+    key = '0e329232ea6d0d73'
     pt ='596F7572206C6970'
     f1(key,'1101'*16)
     #print(DES.encrypt_DES(key,pt))
