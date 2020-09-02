@@ -1,20 +1,23 @@
+from Crypto.Hash import MD5
+
+
 # Hexadecimal to binary conversion 
 def hex2bin(s): 
-    mp = {'0' : "0000",  '1' : "0001", '2' : "0010", '3' : "0011", '4' : "0100", 
-          '5' : "0101",  '6' : "0110", '7' : "0111",  '8' : "1000", '9' : "1001",  
-          'A' : "1010", 'B' : "1011",  'C' : "1100", 'D' : "1101",  'E' : "1110", 
-          'F' : "1111" } 
+    if (s[:2]=='0x'):
+        s=s[2:]
+    mp1 = {'0' : "0000",  '1' : "0001", '2' : "0010", '3' : "0011", '4' : "0100", '5' : "0101",  '6' : "0110", '7' : "0111",  '8' : "1000", '9' : "1001",  "a" : "1010", 'b' : "1011",  'c' : "1100", 'd' : "1101",  'e' : "1110", 'f' : "1111" } 
     bin = "" 
     for i in range(len(s)): 
-        bin = bin + mp[s[i]] 
+        #print("Hello")
+        bin = bin + mp1[s[i]] 
     return bin
       
 # Binary to hexadecimal conversion 
 def bin2hex(s): 
     mp = {"0000" : '0',  "0001" : '1', "0010" : '2',  "0011" : '3', "0100" : '4', 
           "0101" : '5',  "0110" : '6', "0111" : '7',  "1000" : '8', "1001" : '9',  
-          "1010" : 'A', "1011" : 'B',  "1100" : 'C', "1101" : 'D',  "1110" : 'E', 
-          "1111" : 'F' } 
+          "1010" : 'a', "1011" : 'b',  "1100" : 'c', "1101" : 'd',  "1110" : 'e', 
+          "1111" : 'f' } 
     hex = "" 
     for i in range(0,len(s),4): 
         ch = "" 
@@ -49,9 +52,11 @@ def dec2bin(num):
     return res 
 
 # Permute function to rearrange the bits 
-def permute(k, arr, n): 
+def permute(k, arr, n): ## key, keyp, 56   ## pt,initial_perm, 64
+#    print("Hello this is len(k) = ",len(k), "k = ",k)
+
     permutation = "" 
-    for i in range(0, n): 
+    for i in range(0, n):   ## n = 56
         permutation = permutation + k[arr[i] - 1] 
     return permutation 
   
@@ -156,8 +161,10 @@ final_perm = [ 40, 8, 48, 16, 56, 24, 64, 32,
                33, 1, 41, 9, 49, 17, 57, 25 ] 
 
 def encrypt(pt, rkb, rk): 
-    pt = hex2bin(pt) 
-      
+    pt = hex2bin(pt).zfill(64) 
+    #print(pt,len(pt),type(pt))
+    #xt = bin(int(pt,16))[2:]  
+    #print(xt, len(xt),type(xt))
     # Initial Permutation 
     pt = permute(pt, initial_perm, 64) 
     #print("After inital permutation", bin2hex(pt)) 
@@ -199,9 +206,6 @@ def encrypt(pt, rkb, rk):
     cipher_text = permute(combine, final_perm, 64) 
     return bin2hex(cipher_text) 
 
-#pt = "123456ABCD132536"
-#key = "AABB09182736CCDD"
-  
 
 def key_processing_decryption(key):
             key = hex2bin(key) 
@@ -217,7 +221,7 @@ def key_processing_decryption(key):
                     21, 13, 5, 28, 20, 12, 4 ] 
             
             # getting 56 bit key from 64 bit using the parity bits  
-            key = permute(key, keyp, 56) 
+            key = permute(key, keyp, 56)   # k, arr, n
             
             # Number of bit shifts  
             shift_table = [1, 1, 2, 2,  
@@ -260,8 +264,9 @@ def key_processing_decryption(key):
             return rk_rev,rkb_rev
 
 def key_processing_encryption(key):
-            key = hex2bin(key) 
-            
+            #print("Hello this is line 266 key = ",key)
+            key = hex2bin(key).zfill(64) 
+            #print("Hello this is line 268 key = ",key)
             # --parity bit drop table 
             keyp = [57, 49, 41, 33, 25, 17, 9,  
                     1, 58, 50, 42, 34, 26, 18,  
@@ -314,6 +319,7 @@ def key_processing_encryption(key):
 
 
 def encrypt_DES(key,plaintext):
+    #print("This is line 320, the key in encrypt_DES is ",key)
     rk,rkb = key_processing_encryption(key)
     return(encrypt(plaintext,rkb,rk))
 
@@ -322,12 +328,32 @@ def decrypt_DES(key,ciphertext):
     return(encrypt(ciphertext,rkb_rev,rk_rev))
 
 def main():
-    key=input("Key = ")
-    pt=input("Plain text = ")
-    ct=encrypt_DES(key,pt)
-    print("Cipher text: ",ct,"\n")
-    print("Plain text: ",decrypt_DES(key,ct))
-
+    #pt = "123456ABCD132536"
+    #key = "AABB09182736CCDD"
+  #### ensure all leters are small in hex
+    #key="aabb09182736ccdd" #input("Key = ")
+    #pt="123456abcd132536" #input("Plain text = ")
+    #ct=encrypt_DES(key,pt)
+    #print("\nCipher text: ",ct,"\n")
+    #print("Plain text: ",decrypt_DES(key,ct),"\n")
+    key='0e329232ea6d0d73'
+    hash = MD5.new()
+    message=('10001111'*8).encode('utf-8')
+    hash.update(message)
+    hash_md5 = hash.hexdigest()
+    ### hash_md5 be like 3c1898a00cc4579728e1268191a64bc6 
+    hash_bin=bin(int(hash_md5,16))[2:].zfill(128)
+    ### hash_bin be like 00111100000110001001100010100000000011001...., type = str
+    first_half = int(hash_bin[:64],2)
+    second_half = int(hash_bin[64:],2)
+    print(hex(first_half))
+    print("Key = ",key)
+    inner_des =encrypt_DES(key, hex(first_half)[2:])
+    print(inner_des)
+    final_input = int(inner_des,16)^second_half    
+    print("final_input = ",len(hex(final_input)[2:]))
+    result = encrypt_DES(key,hex(final_input)[2:])
+    print("result = ", result)
 
 
 

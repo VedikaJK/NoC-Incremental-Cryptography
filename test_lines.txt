@@ -1,0 +1,23 @@
+#Test Statements --------------------------------------------------------
+    
+    tag, h = encrypt_message(key, ['1111'*16,'1010'*16])
+    tag2, h2 = encrypt_message(key, ['1001'*16,'1000'*16])
+    tag3, h3 = encrypt_message(key, ['1101'*16,'1010'*16])
+    D1 = ip.image_to_blocks('pic1.jpg')
+    D2 = ip.image_to_blocks('pic2.jpg')
+    D3 = ip.image_to_blocks('krishnabday.jpg')
+    tag4, h4 = encrypt_message(key, D1)
+    tag5, h5 = encrypt_message(key, D2)
+    R1=randomize_blocks(D1)
+    R2=randomize_blocks(D2)
+    R3=randomize_blocks(D3)
+    
+    print(D1==D2)
+    print(R1==R2)
+    print(D1==D3)
+
+    print("\nTag = ",tag ,"\nHash = ", h,"\n")
+    print("\nTag2 = ",tag2 ,"\nHash2 = ", h2,"\n")
+    print("\nTag3 = ",tag3 ,"\nHash3 = ", h3,"\n")
+    print("\nTag4 = ",tag4 ,"\nHash4 = ", h4,"\n")
+    print("\nTag5 = ",tag5 ,"\nHash5 = ", h5,"\n")
