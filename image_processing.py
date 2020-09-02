@@ -40,6 +40,8 @@ def image_to_blocks(file_name):
     D = binary_pixels_to_blocks(arr2)
     return D
 
+
+##### NOT WORKING YET
 def convert_array_to_image(arr_1D,name_for_image, h,w):
     data = np.zeros((h, w, 3), dtype=np.uint8)
     #code to conert 1D array to 3d array for image
