@@ -1,5 +1,5 @@
 from Crypto.Hash import MD5
-
+import time
 
 # Hexadecimal to binary conversion 
 def hex2bin(s): 
@@ -161,6 +161,8 @@ final_perm = [ 40, 8, 48, 16, 56, 24, 64, 32,
                33, 1, 41, 9, 49, 17, 57, 25 ] 
 
 def encrypt(pt, rkb, rk): 
+    #### type OF PLAINTEXT IS 
+#    print("TYPE pt ", type(pt))
     pt = hex2bin(pt).zfill(64) 
     #print(pt,len(pt),type(pt))
     #xt = bin(int(pt,16))[2:]  
@@ -321,9 +323,10 @@ def key_processing_encryption(key):
 def encrypt_DES(key,plaintext):
     #print("This is line 320, the key in encrypt_DES is ",key)
     rk,rkb = key_processing_encryption(key)
+    #print("rk, rkb : ", rk,rkb)
     return(encrypt(plaintext,rkb,rk))
 
-def decrypt_DES(key,ciphertext):
+def decrypt_DES(key,ciphertext):   ### ct is str
     rk_rev,rkb_rev = key_processing_decryption(key)
     return(encrypt(ciphertext,rkb_rev,rk_rev))
 
@@ -331,31 +334,20 @@ def main():
     #pt = "123456ABCD132536"
     #key = "AABB09182736CCDD"
   #### ensure all leters are small in hex
-    #key="aabb09182736ccdd" #input("Key = ")
-    #pt="123456abcd132536" #input("Plain text = ")
-    #ct=encrypt_DES(key,pt)
+    key="aabb09182736ccdd" #input("Key = ")
+    pt="123456abcd132536" #input("Plain text = ")
+    ct=encrypt_DES(key,pt)
     #print("\nCipher text: ",ct,"\n")
     #print("Plain text: ",decrypt_DES(key,ct),"\n")
-    key='0e329232ea6d0d73'
-    hash = MD5.new()
-    message=('10001111'*8).encode('utf-8')
-    hash.update(message)
-    hash_md5 = hash.hexdigest()
-    ### hash_md5 be like 3c1898a00cc4579728e1268191a64bc6 
-    hash_bin=bin(int(hash_md5,16))[2:].zfill(128)
-    ### hash_bin be like 00111100000110001001100010100000000011001...., type = str
-    first_half = int(hash_bin[:64],2)
-    second_half = int(hash_bin[64:],2)
-    print(hex(first_half))
-    print("Key = ",key)
-    inner_des =encrypt_DES(key, hex(first_half)[2:])
-    print(inner_des)
-    final_input = int(inner_des,16)^second_half    
-    print("final_input = ",len(hex(final_input)[2:]))
-    result = encrypt_DES(key,hex(final_input)[2:])
-    print("result = ", result)
+    #key='0e329232ea6d0d73'
+    ppt = decrypt_DES(key,ct)
+    print(decrypt_DES('0e329232ea6d0d73','287ddf6feeed1323'))
+    #start = time.process_time()
+    #print(time.process_time() - start)
+    
 
 
 
 if __name__ == "__main__":
     main()
+
