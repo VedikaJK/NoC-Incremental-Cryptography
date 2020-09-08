@@ -7,12 +7,15 @@ import encryption_module as em
 
 def main():
     key = '0e329232ea6d0d73'
-    
-    D1 = ip.image_to_blocks('pic1.png')
+    key = input('Enter key in hex without 0x')
+
+#    D1 = ip.image_to_blocks('pic1.png')
+    D1 = ip.image_to_blocks(input('Image 1 name : '))
     tag1, h1 = em.encrypt_message(key, D1)   
     print("Tag1 : ",tag1,"\n h1 : ",h1,"\n")
     
-    D2 = ip.image_to_blocks('pic2.png')
+#    D2 = ip.image_to_blocks('pic2.png')
+    D2 = ip.image_to_blocks(input('Image 2 name : '))
     tag2, h2= em.encrypt_message(key, D2)   
     print("Tag2 : ",tag2,"\n h2 : ",h2,"\n")
     
