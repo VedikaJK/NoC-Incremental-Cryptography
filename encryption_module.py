@@ -54,42 +54,31 @@ def incremental_update_genrate_hash(key_tag,tag,indices_to_update_list_sorted,or
     ### TAG IS OF STR TYPE
     ### 2nd argument should be str type
     h = DES.decrypt_DES(key_tag,tag)
-    #print("From em module line 56 h we have decrypted",h)
+    print("From em module line 56 h we have decrypted",h)
     h=int(h,16)
-    #print("From em module line 58 h we have decrypted",h)
-    #print(h,type(h))
-    to_remove = 0
+
     R = randomize_blocks(original_message_list)
-    #print(R)
+    R_new = randomize_blocks(updated_messages_list_ac_indices)
+
     ### str type
     N = len(R)
+    #visited =[0]*N
     nb = len(indices_to_update_list_sorted)
-    #print(N,nb)
-    for i in range(nb) :
-        if ((indices_to_update_list_sorted[i]!= N-1)&(indices_to_update_list_sorted[i]!= 0)):
-            to_remove=to_remove^f1( hex(int(R[i],2))[2:] , R[i+1])^f1( hex(int(R[i-1],2))[2:] , R[i])   
-        elif (indices_to_update_list_sorted[i]==N-1):
-            to_remove=to_remove^f1( hex(int(R[N-1],2))[2:] , R[0])^f1( hex(int(R[N-2],2))[2:] , R[N-1])
-        elif (indices_to_update_list_sorted[i]==0):            
-            to_remove=to_remove^f1( hex(int(R[N-1],2))[2:] , R[0])^f1( hex(int(R[0],2))[2:] , R[1])
-    #print("f1 line 72 ",f1( hex(int(R[i],2))[2:] , R[i+1]))
-    #print(to_remove)
-    #print("line 74 em ", h^to_remove)
-    to_add = 0
-    R_new = randomize_blocks(updated_messages_list_ac_indices)
-    #print("R_new", R_new)
-    for i in range(nb):
-        R[indices_to_update_list_sorted[i]] = R_new[i]
-    for i in range(nb) :
-        if ((indices_to_update_list_sorted[i]!= N-1)&(indices_to_update_list_sorted[i]!= 0)):
-            to_add=to_add^f1( hex(int(R[i],2))[2:] , R[i+1])^f1( hex(int(R[i-1],2))[2:] , R[i])   
-        elif (indices_to_update_list_sorted[i]==N-1):
-            to_add=to_add^f1( hex(int(R[N-1],2))[2:] , R[0])^f1( hex(int(R[N-2],2))[2:] , R[N-1])
-        elif (indices_to_update_list_sorted[i]==0):            
-            to_add=to_add^f1( hex(int(R[N-1],2))[2:] , R[0])^f1( hex(int(R[0],2))[2:] , R[1])
 
-    h=h^to_remove^to_add
-    #print("line 82 h ", h, type(h))
+    for i in range(nb):
+        j = indices_to_update_list_sorted[i]
+        if(j!=0 & j!=N-1):
+            h=h^f1( hex(int(R[j],2))[2:] , R[j+1])^f1( hex(int(R[j-1],2))[2:] , R[j])
+            R[j]=R_new[i]
+            h=h^f1( hex(int(R[j],2))[2:] , R[j+1])^f1( hex(int(R[j-1],2))[2:] , R[j])
+        if(j==0):
+                h=h^f1( hex(int(R[0],2))[2:] , R[1])^f1( hex(int(R[N-1],2))[2:] , R[0])
+                R[j]=R_new[i]
+                h=h^f1( hex(int(R[0],2))[2:] , R[1])^f1( hex(int(R[N-1],2))[2:] , R[0])
+        if(j==N-1):
+                h=h^f1( hex(int(R[N-2],2))[2:] , R[N-1])^f1( hex(int(R[N-1],2))[2:] , R[0])
+                R[j]=R_new[i]
+                h=h^f1( hex(int(R[N-2],2))[2:] , R[N-1])^f1( hex(int(R[N-1],2))[2:] , R[0])                
+    
     tag_updated = DES.encrypt_DES(key_tag,hex(h))
     return tag_updated, hex(h)
-

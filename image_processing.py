@@ -54,18 +54,29 @@ def convert_array_to_image(arr_1D,name_for_image, h,w):
     img.save(name_for_image)
     return img
 
+def difference_between_2_arrays(arr1,arr2):
+    n=len(arr1)
+    arr2_different_values=[]
+    arr2_different_indices =[]
+    for i in range(n):
+        if(arr1[i]!=arr2[i]):
+            arr2_different_indices.append(i)
+            arr2_different_values.append(arr2[i])
+    return arr2_different_indices,arr2_different_values
+
+
 def test_run_incremental():
-#    arr1 = read_image_convert_to_1D_pixel_array('pic1.jpg')
-#    arr2 = int_array_to_binary(arr1)
-#    D1 = binary_pixels_to_blocks(arr2)
-    D1 = ['1101'*16,'1010'*16,'0011'*16,'0000'*16]
+    arr1 = read_image_convert_to_1D_pixel_array('pic1.png')
+    arr2 = int_array_to_binary(arr1)
+    D1 = binary_pixels_to_blocks(arr2)
+#    D1 = ['1101'*16,'1010'*16,'0011'*16,'0000'*16]
 
 
 #    print(type(D1[0]))   # str
-#   arr1 = read_image_convert_to_1D_pixel_array('pic2.jpg')
-#    arr2 = int_array_to_binary(arr1)
-#    D2 = binary_pixels_to_blocks(arr2)
-    D2 = ['1001'*16,'1010'*16,'0011'*16,'0000'*16]
+    arr1 = read_image_convert_to_1D_pixel_array('pic2.png')
+    arr2 = int_array_to_binary(arr1)
+    D2 = binary_pixels_to_blocks(arr2)
+#    D2 = ['1001'*16,'1010'*16,'0011'*16,'0000'*16]
 
 
     indices =[]
@@ -78,4 +89,4 @@ def test_run_incremental():
     #print(update_list,indices)
     return indices, update_list
 
-test_run_incremental()
+#test_run_incremental()
